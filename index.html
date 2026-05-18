@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园打卡指南</title>
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 页面基础样式 */
+        html {
+            scroll-behavior: smooth; /* 平滑滚动效果 */
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f9f9; /* 淡薄荷绿背景 */
+        }
+
+        /* 顶部标题栏 - 固定在顶部 */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(135deg, #a8e6cf 0%, #87ceeb 100%); /* 薄荷绿+浅蓝渐变 */
+            color: #2d5a5a;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* 主体内容区域 */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 2rem 60px; /* 留出顶部固定栏空间 */
+        }
+
+        /* 打卡点卡片容器 - 网格布局 */
+        .spots-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem 0;
+        }
+
+        /* 打卡点卡片样式 */
+        .spot-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        /* Hover上浮动画效果 */
+        .spot-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 卡片图片区域 */
+        .spot-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #e8f5f3 0%, #e0f0ff 100%);
+        }
+
+        /* 卡片内容区域 */
+        .spot-content {
+            padding: 1.2rem;
+        }
+
+        .spot-content h3 {
+            font-size: 1.25rem;
+            color: #2d5a5a;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .spot-content p {
+            font-size: 0.9rem;
+            color: #5a7a7a;
+            line-height: 1.7;
+        }
+
+        /* 底部版权信息 */
+        footer {
+            background-color: #2d5a5a;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        footer p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* 响应式设计 - 移动端适配 */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            header p {
+                font-size: 0.9rem;
+            }
+
+            main {
+                padding: 100px 1rem 40px;
+            }
+
+            .spots-container {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+
+            .spot-image {
+                height: 160px;
+            }
+        }
+
+        /* 响应式设计 - 平板端适配 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .spots-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部标题栏 -->
+    <header>
+        <div class="header-content">
+            <h1>🏫 校园打卡指南</h1>
+            <p>探索校园最美角落，记录青春美好时光</p>
+        </div>
+    </header>
+
+    <!-- 主体内容区域 -->
+    <main>
+        <div class="spots-container">
+            <!-- 打卡点1：图书馆 -->
+            <article class="spot-card">
+                <img 
+                    src="images/library.jpg" 
+                    alt="图书馆" 
+                    class="spot-image"
+                />
+                <div class="spot-content">
+                    <h3>📚 图书馆</h3>
+                    <p>知识的海洋，静谧的学习圣地。这里藏书丰富，环境优雅，是自习和阅读的最佳选择。阳光透过落地窗洒进来，营造出温馨的学习氛围。</p>
+                </div>
+            </article>
+
+            <!-- 打卡点2：樱花大道 -->
+            <article class="spot-card">
+                <img 
+                    src="images/cherry_blossom.jpg" 
+                    alt="樱花大道" 
+                    class="spot-image"
+                />
+                <div class="spot-content">
+                    <h3>🌸 樱花大道</h3>
+                    <p>春日必打卡景点！每年四月，粉色樱花盛开，整条道路宛如梦幻仙境。微风拂过，花瓣飘落，美不胜收。</p>
+                </div>
+            </article>
+
+            <!-- 打卡点3：湖心亭 -->
+            <article class="spot-card">
+                <img 
+                    src="images/lake_pavilion.jpg" 
+                    alt="湖心亭" 
+                    class="spot-image"
+                />
+                <div class="spot-content">
+                    <h3>🏯 湖心亭</h3>
+                    <p>校园中心的静谧之地，湖水清澈，荷花盛开。古色古香的亭子倒映在水中，是晨读和放松的好去处。</p>
+                </div>
+            </article>
+
+            <!-- 打卡点4：体育馆 -->
+            <article class="spot-card">
+                <img 
+                    src="images/gymnasium.jpg" 
+                    alt="体育馆" 
+                    class="spot-image"
+                />
+                <div class="spot-content">
+                    <h3>⚽ 体育馆</h3>
+                    <p>现代化的体育设施，包含篮球场、羽毛球场、健身房等。在这里挥洒汗水，展现青春活力，是运动爱好者的天堂。</p>
+                </div>
+            </article>
+
+            <!-- 打卡点5：教学楼 -->
+            <article class="spot-card">
+                <img 
+                    src="images/teaching_building.jpg" 
+                    alt="教学楼" 
+                    class="spot-image"
+                />
+                <div class="spot-content">
+                    <h3>🏛️ 教学楼</h3>
+                    <p>知识传递的殿堂，宽敞明亮的教室，先进的教学设备。在这里聆听名师授课，开启知识探索之旅。</p>
+                </div>
+            </article>
+
+            <!-- 打卡点6：食堂 -->
+            <article class="spot-card">
+                <img 
+                    src="images/canteen.jpg" 
+                    alt="食堂" 
+                    class="spot-image"
+                />
+                <div class="spot-content">
+                    <h3>🍜 学生食堂</h3>
+                    <p>校园美食聚集地，各地风味应有尽有。经济实惠，品种丰富，是同学们聚餐聊天的好地方。</p>
+                </div>
+            </article>
+
+            <!-- 打卡点7：操场 -->
+            <article class="spot-card">
+                <img 
+                    src="images/sports_field.jpg" 
+                    alt="操场" 
+                    class="spot-image"
+                />
+                <div class="spot-content">
+                    <h3>🏃 田径场</h3>
+                    <p>绿草如茵的足球场，红色的塑胶跑道。清晨慢跑，傍晚散步，感受青春的气息与活力。</p>
+                </div>
+            </article>
+
+            <!-- 打卡点8：艺术中心 -->
+            <article class="spot-card">
+                <img 
+                    src="images/art_center.jpg" 
+                    alt="艺术中心" 
+                    class="spot-image"
+                />
+                <div class="spot-content">
+                    <h3>🎨 艺术中心</h3>
+                    <p>校园文化艺术的殿堂，经常举办各类展览和演出。充满艺术气息的空间，激发无限创意灵感。</p>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <!-- 底部版权信息 -->
+    <footer>
+        <p>&copy; 2024 校园打卡指南 | 记录青春美好时光</p>
+    </footer>
+</body>
+</html>
