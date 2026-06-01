@@ -5,32 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>校园打卡指南</title>
     <style>
-        /* 全局样式重置 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* 页面基础样式 */
         html {
-            scroll-behavior: smooth; /* 平滑滚动效果 */
+            scroll-behavior: smooth;
         }
 
         body {
             font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
             line-height: 1.6;
             color: #333;
-            background-color: #f5f9f9; /* 淡薄荷绿背景 */
+            background-color: #f5f9f9;
         }
 
-        /* 顶部标题栏 - 固定在顶部 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #a8e6cf 0%, #87ceeb 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader {
+            text-align: center;
+            color: white;
+        }
+
+        .loader-ring {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, #a8e6cf, #87ceeb);
+            z-index: 1001;
+            transition: width 0.1s ease;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #a8e6cf 0%, #87ceeb 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(168, 230, 207, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(168, 230, 207, 0.5);
+        }
+
         header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background: linear-gradient(135deg, #a8e6cf 0%, #87ceeb 100%); /* 薄荷绿+浅蓝渐变 */
+            background: linear-gradient(135deg, #a8e6cf 0%, #87ceeb 100%);
             color: #2d5a5a;
             padding: 1rem 2rem;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -40,28 +118,106 @@
         .header-content {
             max-width: 1200px;
             margin: 0 auto;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
+        .header-content h1 {
+            font-size: 1.5rem;
             font-weight: 600;
         }
 
-        header p {
-            font-size: 1rem;
-            opacity: 0.9;
+        .nav-links {
+            display: flex;
+            gap: 1rem;
         }
 
-        /* 主体内容区域 */
+        .nav-links a {
+            color: #2d5a5a;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
         main {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 120px 2rem 60px; /* 留出顶部固定栏空间 */
+            padding: 100px 2rem 60px;
         }
 
-        /* 打卡点卡片容器 - 网格布局 */
+        .filter-section {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 400px;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e0f0f0;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .search-box:focus {
+            border-color: #a8e6cf;
+            box-shadow: 0 0 0 3px rgba(168, 230, 207, 0.3);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            padding: 0.4rem 1rem;
+            background: #f0f7f7;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .tag:hover {
+            background: #e0f0f0;
+        }
+
+        .tag.active {
+            background: linear-gradient(135deg, #a8e6cf 0%, #87ceeb 100%);
+            color: white;
+        }
+
+        .sort-options {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .sort-options select {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e0f0f0;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
         .spots-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -69,33 +225,50 @@
             padding: 2rem 0;
         }
 
-        /* 打卡点卡片样式 */
         .spot-card {
             background: white;
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             cursor: pointer;
+            opacity: 0;
+            transform: translateY(30px);
         }
 
-        /* Hover上浮动画效果 */
+        .spot-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         .spot-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(168, 230, 207, 0.3);
         }
 
-        /* 卡片图片区域 */
+        .spot-card:hover .spot-image {
+            transform: scale(1.05);
+        }
+
+        .spot-card:hover .spot-content h3 {
+            color: #56ab2f;
+        }
+
         .spot-image {
             width: 100%;
             height: 180px;
             object-fit: cover;
             background: linear-gradient(135deg, #e8f5f3 0%, #e0f0ff 100%);
+            transition: transform 0.4s ease;
         }
 
-        /* 卡片内容区域 */
+        .spot-image[src=""] {
+            background: linear-gradient(135deg, #e8f5f3 0%, #e0f0ff 100%);
+        }
+
         .spot-content {
             padding: 1.2rem;
+            position: relative;
         }
 
         .spot-content h3 {
@@ -103,15 +276,361 @@
             color: #2d5a5a;
             margin-bottom: 0.8rem;
             font-weight: 600;
+            transition: color 0.3s ease;
         }
 
         .spot-content p {
             font-size: 0.9rem;
             color: #5a7a7a;
             line-height: 1.7;
+            margin-bottom: 1rem;
         }
 
-        /* 底部版权信息 */
+        .spot-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .spot-tag {
+            padding: 0.2rem 0.6rem;
+            background: #e8f5f3;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            color: #5a7a7a;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .action-left {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .like-btn, .favorite-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #888;
+            transition: all 0.3s ease;
+            padding: 0.4rem 0.6rem;
+            border-radius: 20px;
+        }
+
+        .like-btn:hover, .favorite-btn:hover {
+            background: #f0f7f7;
+        }
+
+        .like-btn.liked, .favorite-btn.favorited {
+            color: #ff6b6b;
+        }
+
+        .like-btn.liked {
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .share-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #888;
+            transition: all 0.3s ease;
+            padding: 0.4rem 0.6rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .share-btn:hover {
+            background: #f0f7f7;
+            color: #56ab2f;
+        }
+
+        .rating {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            cursor: pointer;
+            color: #ddd;
+            font-size: 1rem;
+            transition: color 0.2s ease;
+        }
+
+        .star.active, .star:hover {
+            color: #ffc107;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #888;
+        }
+
+        .comments-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 3rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .comments-section h2 {
+            font-size: 1.5rem;
+            color: #2d5a5a;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .comment-form {
+            margin-bottom: 2rem;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0f0f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            outline: none;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .comment-input:focus {
+            border-color: #a8e6cf;
+            box-shadow: 0 0 0 3px rgba(168, 230, 207, 0.3);
+        }
+
+        .comment-form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comment-count {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .submit-btn {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, #a8e6cf 0%, #87ceeb 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(168, 230, 207, 0.4);
+        }
+
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .comment-item {
+            padding: 1.5rem;
+            background: #f8fdfb;
+            border-radius: 12px;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .comment-author {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #2d5a5a;
+        }
+
+        .comment-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #a8e6cf 0%, #87ceeb 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .comment-time {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .comment-content {
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 0.8rem;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .comment-action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #888;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: color 0.3s ease;
+        }
+
+        .comment-action-btn:hover {
+            color: #56ab2f;
+        }
+
+        .lightbox-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .lightbox-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .lightbox-image {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .lightbox-caption {
+            text-align: center;
+            color: white;
+            margin-top: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .lightbox-counter {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .lightbox-close, .lightbox-prev, .lightbox-next {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-close:hover, .lightbox-prev:hover, .lightbox-next:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .lightbox-close {
+            top: -60px;
+            right: 0;
+        }
+
+        .lightbox-prev {
+            left: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .lightbox-next {
+            right: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
         footer {
             background-color: #2d5a5a;
             color: white;
@@ -120,23 +639,51 @@
             margin-top: 2rem;
         }
 
-        footer p {
-            font-size: 0.9rem;
-            opacity: 0.9;
+        footer a {
+            color: #a8e6cf;
+            text-decoration: none;
         }
 
-        /* 响应式设计 - 移动端适配 */
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #2d5a5a;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.5rem;
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
             }
 
-            header p {
-                font-size: 0.9rem;
+            header h1 {
+                font-size: 1.3rem;
+            }
+
+            .nav-links {
+                gap: 0.5rem;
             }
 
             main {
-                padding: 100px 1rem 40px;
+                padding: 140px 1rem 40px;
             }
 
             .spots-container {
@@ -147,9 +694,38 @@
             .spot-image {
                 height: 160px;
             }
+
+            .sort-options {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .lightbox-prev, .lightbox-next {
+                display: none;
+            }
+
+            .lightbox-close {
+                top: -40px;
+            }
+
+            .back-to-top {
+                bottom: 1.5rem;
+                right: 1.5rem;
+                width: 45px;
+                height: 45px;
+            }
+
+            .comment-form-actions {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .submit-btn {
+                width: 100%;
+            }
         }
 
-        /* 响应式设计 - 平板端适配 */
         @media (min-width: 769px) and (max-width: 1024px) {
             .spots-container {
                 grid-template-columns: repeat(2, 1fr);
@@ -158,126 +734,717 @@
     </style>
 </head>
 <body>
-    <!-- 顶部标题栏 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader">
+            <div class="loader-ring"></div>
+            <p>正在加载校园打卡指南...</p>
+        </div>
+    </div>
+
+    <div class="progress-bar" id="progressBar"></div>
+
     <header>
         <div class="header-content">
             <h1>🏫 校园打卡指南</h1>
-            <p>探索校园最美角落，记录青春美好时光</p>
+            <nav class="nav-links">
+                <a href="about.html">关于站长</a>
+                <a href="#comments">留言板</a>
+            </nav>
         </div>
     </header>
 
-    <!-- 主体内容区域 -->
     <main>
-        <div class="spots-container">
-            <!-- 打卡点1：图书馆 -->
-            <article class="spot-card">
-                <img 
-                    src="images/library.jpg" 
-                    alt="图书馆" 
-                    class="spot-image"
-                />
-                <div class="spot-content">
-                    <h3>📚 图书馆</h3>
-                    <p>知识的海洋，静谧的学习圣地。这里藏书丰富，环境优雅，是自习和阅读的最佳选择。阳光透过落地窗洒进来，营造出温馨的学习氛围。</p>
-                </div>
-            </article>
-
-            <!-- 打卡点2：樱花大道 -->
-            <article class="spot-card">
-                <img 
-                    src="images/cherry_blossom.jpg" 
-                    alt="樱花大道" 
-                    class="spot-image"
-                />
-                <div class="spot-content">
-                    <h3>🌸 樱花大道</h3>
-                    <p>春日必打卡景点！每年四月，粉色樱花盛开，整条道路宛如梦幻仙境。微风拂过，花瓣飘落，美不胜收。</p>
-                </div>
-            </article>
-
-            <!-- 打卡点3：湖心亭 -->
-            <article class="spot-card">
-                <img 
-                    src="images/lake_pavilion.jpg" 
-                    alt="湖心亭" 
-                    class="spot-image"
-                />
-                <div class="spot-content">
-                    <h3>🏯 湖心亭</h3>
-                    <p>校园中心的静谧之地，湖水清澈，荷花盛开。古色古香的亭子倒映在水中，是晨读和放松的好去处。</p>
-                </div>
-            </article>
-
-            <!-- 打卡点4：体育馆 -->
-            <article class="spot-card">
-                <img 
-                    src="images/gymnasium.jpg" 
-                    alt="体育馆" 
-                    class="spot-image"
-                />
-                <div class="spot-content">
-                    <h3>⚽ 体育馆</h3>
-                    <p>现代化的体育设施，包含篮球场、羽毛球场、健身房等。在这里挥洒汗水，展现青春活力，是运动爱好者的天堂。</p>
-                </div>
-            </article>
-
-            <!-- 打卡点5：教学楼 -->
-            <article class="spot-card">
-                <img 
-                    src="images/teaching_building.jpg" 
-                    alt="教学楼" 
-                    class="spot-image"
-                />
-                <div class="spot-content">
-                    <h3>🏛️ 教学楼</h3>
-                    <p>知识传递的殿堂，宽敞明亮的教室，先进的教学设备。在这里聆听名师授课，开启知识探索之旅。</p>
-                </div>
-            </article>
-
-            <!-- 打卡点6：食堂 -->
-            <article class="spot-card">
-                <img 
-                    src="images/canteen.jpg" 
-                    alt="食堂" 
-                    class="spot-image"
-                />
-                <div class="spot-content">
-                    <h3>🍜 学生食堂</h3>
-                    <p>校园美食聚集地，各地风味应有尽有。经济实惠，品种丰富，是同学们聚餐聊天的好地方。</p>
-                </div>
-            </article>
-
-            <!-- 打卡点7：操场 -->
-            <article class="spot-card">
-                <img 
-                    src="images/sports_field.jpg" 
-                    alt="操场" 
-                    class="spot-image"
-                />
-                <div class="spot-content">
-                    <h3>🏃 田径场</h3>
-                    <p>绿草如茵的足球场，红色的塑胶跑道。清晨慢跑，傍晚散步，感受青春的气息与活力。</p>
-                </div>
-            </article>
-
-            <!-- 打卡点8：艺术中心 -->
-            <article class="spot-card">
-                <img 
-                    src="images/art_center.jpg" 
-                    alt="艺术中心" 
-                    class="spot-image"
-                />
-                <div class="spot-content">
-                    <h3>🎨 艺术中心</h3>
-                    <p>校园文化艺术的殿堂，经常举办各类展览和演出。充满艺术气息的空间，激发无限创意灵感。</p>
-                </div>
-            </article>
+        <div class="filter-section">
+            <input type="text" class="search-box" placeholder="🔍 搜索打卡点..." id="searchInput"/>
+            <div class="tags-container">
+                <span class="tag active" data-tag="all">全部</span>
+                <span class="tag" data-tag="学习">📚 学习</span>
+                <span class="tag" data-tag="风景">🌸 风景</span>
+                <span class="tag" data-tag="运动">⚽ 运动</span>
+                <span class="tag" data-tag="美食">🍜 美食</span>
+                <span class="tag" data-tag="艺术">🎨 艺术</span>
+                <span class="tag" data-tag="生活">🏠 生活</span>
+            </div>
+            <div class="sort-options">
+                <span>排序：</span>
+                <select id="sortSelect">
+                    <option value="default">默认排序</option>
+                    <option value="name-asc">名称升序</option>
+                    <option value="name-desc">名称降序</option>
+                    <option value="likes">点赞最多</option>
+                    <option value="rating">评分最高</option>
+                </select>
+            </div>
         </div>
+
+        <div class="spots-container" id="spotsContainer"></div>
+
+        <div id="noResults" class="no-results" style="display: none;">
+            <h3>😔 没有找到匹配的打卡点</h3>
+            <p>试试其他关键词或标签吧</p>
+        </div>
+
+        <section class="comments-section" id="comments">
+            <h2>💬 留言板</h2>
+            <div class="comment-form">
+                <textarea class="comment-input" id="commentInput" placeholder="写下你的留言或建议..."></textarea>
+                <div class="comment-form-actions">
+                    <span class="comment-count">共 <span id="commentCount">0</span> 条留言</span>
+                    <button class="submit-btn" id="submitComment">发布留言</button>
+                </div>
+            </div>
+            <div class="comments-list" id="commentsList"></div>
+        </section>
     </main>
 
-    <!-- 底部版权信息 -->
+    <div class="lightbox-overlay" id="lightbox">
+        <button class="lightbox-close" id="lightboxClose">✕</button>
+        <button class="lightbox-prev" id="lightboxPrev">←</button>
+        <div class="lightbox-content">
+            <img src="" alt="" class="lightbox-image" id="lightboxImage"/>
+            <div class="lightbox-caption" id="lightboxCaption"></div>
+            <div class="lightbox-counter" id="lightboxCounter"></div>
+        </div>
+        <button class="lightbox-next" id="lightboxNext">→</button>
+    </div>
+
+    <button class="back-to-top" id="backToTop">↑</button>
+
+    <div class="toast" id="toast"></div>
+
     <footer>
-        <p>&copy; 2024 校园打卡指南 | 记录青春美好时光</p>
+        <p>&copy; 2024 校园打卡指南 | 记录青春美好时光 | <a href="about.html">关于站长</a></p>
     </footer>
+
+    <script>
+        const spotsData = [
+            {
+                id: 1,
+                name: '图书馆',
+                emoji: '📚',
+                tags: ['学习'],
+                desc: '知识的海洋，静谧的学习圣地。这里藏书丰富，环境优雅，是自习和阅读的最佳选择。阳光透过落地窗洒进来，营造出温馨的学习氛围。',
+                image: 'images/library.jpg',
+                likes: 0,
+                rating: 0
+            },
+            {
+                id: 2,
+                name: '樱花大道',
+                emoji: '🌸',
+                tags: ['风景'],
+                desc: '春日必打卡景点！每年四月，粉色樱花盛开，整条道路宛如梦幻仙境。微风拂过，花瓣飘落，美不胜收。',
+                image: 'images/cherry_blossom.jpg',
+                likes: 0,
+                rating: 0
+            },
+            {
+                id: 3,
+                name: '湖心亭',
+                emoji: '🏯',
+                tags: ['风景'],
+                desc: '校园中心的静谧之地，湖水清澈，荷花盛开。古色古香的亭子倒映在水中，是晨读和放松的好去处。',
+                image: 'images/lake_pavilion.jpg',
+                likes: 0,
+                rating: 0
+            },
+            {
+                id: 4,
+                name: '体育馆',
+                emoji: '⚽',
+                tags: ['运动'],
+                desc: '现代化的体育设施，包含篮球场、羽毛球场、健身房等。在这里挥洒汗水，展现青春活力，是运动爱好者的天堂。',
+                image: 'images/gymnasium.jpg',
+                likes: 0,
+                rating: 0
+            },
+            {
+                id: 5,
+                name: '教学楼',
+                emoji: '🏛️',
+                tags: ['学习'],
+                desc: '知识传递的殿堂，宽敞明亮的教室，先进的教学设备。在这里聆听名师授课，开启知识探索之旅。',
+                image: 'images/teaching_building.jpg',
+                likes: 0,
+                rating: 0
+            },
+            {
+                id: 6,
+                name: '学生食堂',
+                emoji: '🍜',
+                tags: ['美食'],
+                desc: '校园美食聚集地，各地风味应有尽有。经济实惠，品种丰富，是同学们聚餐聊天的好地方。',
+                image: 'images/canteen.jpg',
+                likes: 0,
+                rating: 0
+            },
+            {
+                id: 7,
+                name: '田径场',
+                emoji: '🏃',
+                tags: ['运动'],
+                desc: '绿草如茵的足球场，红色的塑胶跑道。清晨慢跑，傍晚散步，感受青春的气息与活力。',
+                image: 'images/sports_field.jpg',
+                likes: 0,
+                rating: 0
+            },
+            {
+                id: 8,
+                name: '艺术中心',
+                emoji: '🎨',
+                tags: ['艺术'],
+                desc: '校园文化艺术的殿堂，经常举办各类展览和演出。充满艺术气息的空间，激发无限创意灵感。',
+                image: 'images/art_center.jpg',
+                likes: 0,
+                rating: 0
+            },
+            {
+                id: 9,
+                name: '咖啡厅',
+                emoji: '☕',
+                tags: ['生活', '美食'],
+                desc: '校园里的温馨角落，装修文艺，环境优雅。提供各类咖啡和甜点，是小组讨论和休闲放松的好去处。',
+                image: '',
+                likes: 0,
+                rating: 0
+            },
+            {
+                id: 10,
+                name: '音乐厅',
+                emoji: '🎵',
+                tags: ['艺术'],
+                desc: '专业级音乐演出场馆，音响效果一流。经常举办音乐会、歌唱比赛等文艺活动，是音乐爱好者的圣地。',
+                image: '',
+                likes: 0,
+                rating: 0
+            },
+            {
+                id: 11,
+                name: '樱花湖',
+                emoji: '🌊',
+                tags: ['风景'],
+                desc: '环绕校园的美丽湖泊，湖水碧绿如玉。湖畔种满了樱花树，春天时分风景如画，是散步和拍照的绝佳地点。',
+                image: '',
+                likes: 0,
+                rating: 0
+            },
+            {
+                id: 12,
+                name: '创客空间',
+                emoji: '🔧',
+                tags: ['学习', '生活'],
+                desc: '培养创新思维的摇篮，配备3D打印机、激光切割机等设备。这里是动手实践、实现想法的理想场所。',
+                image: '',
+                likes: 0,
+                rating: 0
+            },
+            {
+                id: 13,
+                name: '深夜食堂',
+                emoji: '🍲',
+                tags: ['美食'],
+                desc: '夜间觅食的好去处，营业到凌晨两点。提供各种夜宵和小吃，是熬夜学习和朋友聚会的好选择。',
+                image: '',
+                likes: 0,
+                rating: 0
+            },
+            {
+                id: 14,
+                name: '天台花园',
+                emoji: '🌻',
+                tags: ['风景', '生活'],
+                desc: '隐藏在城市高处的秘密花园，种植了各种花卉植物。傍晚时分可以俯瞰整个校园，是看日落的最佳位置。',
+                image: '',
+                likes: 0,
+                rating: 0
+            }
+        ];
+
+        let currentImageIndex = 0;
+        let allImages = [];
+
+        function loadData() {
+            const savedLikes = localStorage.getItem('spotLikes');
+            const savedFavorites = localStorage.getItem('spotFavorites');
+            const savedRatings = localStorage.getItem('spotRatings');
+
+            if (savedLikes) {
+                const likes = JSON.parse(savedLikes);
+                spotsData.forEach(spot => {
+                    if (likes[spot.id]) spot.likes = likes[spot.id];
+                });
+            }
+
+            if (savedRatings) {
+                const ratings = JSON.parse(savedRatings);
+                spotsData.forEach(spot => {
+                    if (ratings[spot.id]) spot.rating = ratings[spot.id];
+                });
+            }
+
+            loadComments();
+            renderSpots();
+            updateCommentCount();
+        }
+
+        function saveLikes() {
+            const likes = {};
+            spotsData.forEach(spot => likes[spot.id] = spot.likes);
+            localStorage.setItem('spotLikes', JSON.stringify(likes));
+        }
+
+        function saveRatings(ratings) {
+            localStorage.setItem('spotRatings', JSON.stringify(ratings));
+        }
+
+        function saveFavorites(favorites) {
+            localStorage.setItem('spotFavorites', JSON.stringify(favorites));
+        }
+
+        function renderSpots() {
+            const container = document.getElementById('spotsContainer');
+            container.innerHTML = '';
+            allImages = [];
+
+            spotsData.forEach((spot, index) => {
+                const card = document.createElement('article');
+                card.className = 'spot-card';
+                card.dataset.id = spot.id;
+                card.dataset.tags = spot.tags.join(',');
+                card.style.transitionDelay = `${index * 0.05}s`;
+
+                const hasImage = spot.image && spot.image.trim() !== '';
+                if (hasImage) {
+                    allImages.push({ src: spot.image, title: `${spot.emoji} ${spot.name}` });
+                }
+
+                const avgRating = spot.rating > 0 ? (spot.rating / 2).toFixed(1) : '未评分';
+                const fullStars = Math.round(spot.rating / 2);
+
+                card.innerHTML = `
+                    ${hasImage 
+                        ? `<img src="${spot.image}" alt="${spot.name}" class="spot-image lazy-image" data-title="${spot.emoji} ${spot.name}" loading="lazy"/>`
+                        : `<div class="spot-image" style="display:flex;align-items:center;justify-content:center;font-size:4rem;background:linear-gradient(135deg,#e8f5f3,#e0f0ff);">${spot.emoji}</div>`
+                    }
+                    <div class="spot-content">
+                        <h3>${spot.emoji} ${spot.name}</h3>
+                        <p>${spot.desc}</p>
+                        <div class="spot-tags">
+                            ${spot.tags.map(t => `<span class="spot-tag">${t}</span>`).join('')}
+                        </div>
+                        <div class="card-actions">
+                            <div class="action-left">
+                                <button class="like-btn ${isLiked(spot.id) ? 'liked' : ''}" data-id="${spot.id}">
+                                    <span>❤️</span>
+                                    <span class="like-count">${spot.likes}</span>
+                                </button>
+                                <button class="favorite-btn ${isFavorited(spot.id) ? 'favorited' : ''}" data-id="${spot.id}">
+                                    <span>${isFavorited(spot.id) ? '🌟' : '⭐'}</span>
+                                    <span>${isFavorited(spot.id) ? '已收藏' : '收藏'}</span>
+                                </button>
+                            </div>
+                            <button class="share-btn" data-name="${spot.name}" data-id="${spot.id}">
+                                <span>📤</span>
+                            </button>
+                        </div>
+                        <div class="rating" data-id="${spot.id}">
+                            ${[1,2,3,4,5].map(i => `<span class="star ${i <= fullStars ? 'active' : ''}" data-value="${i * 2}">★</span>`).join('')}
+                            <span style="margin-left:0.5rem;font-size:0.8rem;color:#888;">${avgRating}</span>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+
+                if (hasImage) {
+                    const img = card.querySelector('.spot-image');
+                    img.addEventListener('click', () => {
+                        currentImageIndex = allImages.findIndex(img => img.title === `${spot.emoji} ${spot.name}`);
+                        openLightbox();
+                    });
+                }
+            });
+
+            attachCardEventListeners();
+            setupIntersectionObserver();
+        }
+
+        function isLiked(id) {
+            const saved = localStorage.getItem('likedSpots');
+            return saved ? JSON.parse(saved).includes(id) : false;
+        }
+
+        function isFavorited(id) {
+            const saved = localStorage.getItem('spotFavorites');
+            return saved ? JSON.parse(saved).includes(id) : false;
+        }
+
+        function attachCardEventListeners() {
+            document.querySelectorAll('.like-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = parseInt(btn.dataset.id);
+                    const spot = spotsData.find(s => s.id === id);
+                    let likedSpots = JSON.parse(localStorage.getItem('likedSpots') || '[]');
+
+                    if (btn.classList.contains('liked')) {
+                        spot.likes--;
+                        btn.classList.remove('liked');
+                        likedSpots = likedSpots.filter(lid => lid !== id);
+                    } else {
+                        spot.likes++;
+                        btn.classList.add('liked');
+                        likedSpots.push(id);
+                    }
+
+                    btn.querySelector('.like-count').textContent = spot.likes;
+                    localStorage.setItem('likedSpots', JSON.stringify(likedSpots));
+                    saveLikes();
+                });
+            });
+
+            document.querySelectorAll('.favorite-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = parseInt(btn.dataset.id);
+                    let favorites = JSON.parse(localStorage.getItem('spotFavorites') || '[]');
+
+                    if (btn.classList.contains('favorited')) {
+                        favorites = favorites.filter(fid => fid !== id);
+                        btn.classList.remove('favorited');
+                        btn.innerHTML = '<span>⭐</span><span>收藏</span>';
+                    } else {
+                        favorites.push(id);
+                        btn.classList.add('favorited');
+                        btn.innerHTML = '<span>🌟</span><span>已收藏</span>';
+                    }
+
+                    saveFavorites(favorites);
+                    showToast(btn.classList.contains('favorited') ? '已添加到收藏' : '已取消收藏');
+                });
+            });
+
+            document.querySelectorAll('.share-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const name = btn.dataset.name;
+                    const id = btn.dataset.id;
+                    shareSpot(name, id);
+                });
+            });
+
+            document.querySelectorAll('.rating').forEach(rating => {
+                const stars = rating.querySelectorAll('.star');
+                const id = parseInt(rating.dataset.id);
+                const spot = spotsData.find(s => s.id === id);
+
+                stars.forEach(star => {
+                    star.addEventListener('click', () => {
+                        const value = parseInt(star.dataset.value);
+                        let ratings = JSON.parse(localStorage.getItem('spotRatings') || '{}');
+                        ratings[id] = value;
+                        spot.rating = value;
+                        saveRatings(ratings);
+                        updateRatingDisplay(rating, value);
+                        showToast(`已给出 ${value / 2} 星评分`);
+                    });
+                });
+            });
+        }
+
+        function updateRatingDisplay(rating, value) {
+            const stars = rating.querySelectorAll('.star');
+            const fullStars = Math.round(value / 2);
+            stars.forEach((star, i) => {
+                star.classList.toggle('active', i < fullStars);
+            });
+            rating.querySelector('span:last-child').textContent = (value / 2).toFixed(1);
+        }
+
+        function shareSpot(name, id) {
+            const url = window.location.href.split('#')[0] + `#spot-${id}`;
+            const shareData = {
+                title: '校园打卡指南',
+                text: `推荐一个超棒的校园打卡点：${name}`,
+                url: url
+            };
+
+            if (navigator.share) {
+                navigator.share(shareData).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(url).then(() => {
+                    showToast('分享链接已复制到剪贴板');
+                });
+            }
+        }
+
+        function setupIntersectionObserver() {
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                        }
+                    });
+                },
+                { threshold: 0.1, rootMargin: '50px' }
+            );
+
+            document.querySelectorAll('.spot-card').forEach(card => {
+                observer.observe(card);
+            });
+        }
+
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImage = document.getElementById('lightboxImage');
+        const lightboxCaption = document.getElementById('lightboxCaption');
+        const lightboxCounter = document.getElementById('lightboxCounter');
+
+        function openLightbox() {
+            const validImages = allImages.filter(img => img.src && img.src.trim() !== '');
+            if (validImages.length === 0) return;
+            
+            const image = validImages[currentImageIndex];
+            lightboxImage.src = image.src;
+            lightboxCaption.textContent = image.title;
+            lightboxCounter.textContent = `${currentImageIndex + 1} / ${validImages.length}`;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function prevImage() {
+            const validImages = allImages.filter(img => img.src && img.src.trim() !== '');
+            currentImageIndex = (currentImageIndex - 1 + validImages.length) % validImages.length;
+            openLightbox();
+        }
+
+        function nextImage() {
+            const validImages = allImages.filter(img => img.src && img.src.trim() !== '');
+            currentImageIndex = (currentImageIndex + 1) % validImages.length;
+            openLightbox();
+        }
+
+        document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+        document.getElementById('lightboxPrev').addEventListener('click', prevImage);
+        document.getElementById('lightboxNext').addEventListener('click', nextImage);
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (lightbox.classList.contains('active')) {
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowLeft') prevImage();
+                if (e.key === 'ArrowRight') nextImage();
+            }
+        });
+
+        const searchInput = document.getElementById('searchInput');
+        const tags = document.querySelectorAll('.tag');
+        const sortSelect = document.getElementById('sortSelect');
+        const noResults = document.getElementById('noResults');
+
+        function filterSpots() {
+            const searchText = searchInput.value.toLowerCase();
+            const activeTag = document.querySelector('.tag.active').dataset.tag;
+            const sortBy = sortSelect.value;
+
+            let sortedSpots = [...spotsData];
+
+            if (sortBy === 'name-asc') {
+                sortedSpots.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (sortBy === 'name-desc') {
+                sortedSpots.sort((a, b) => b.name.localeCompare(a.name));
+            } else if (sortBy === 'likes') {
+                sortedSpots.sort((a, b) => b.likes - a.likes);
+            } else if (sortBy === 'rating') {
+                sortedSpots.sort((a, b) => b.rating - a.rating);
+            }
+
+            const cards = document.querySelectorAll('.spot-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const id = parseInt(card.dataset.id);
+                const spot = spotsData.find(s => s.id === id);
+                const title = spot.name.toLowerCase();
+                const desc = spot.desc.toLowerCase();
+                const cardTags = spot.tags.join(',').toLowerCase();
+
+                const matchesSearch = title.includes(searchText) || desc.includes(searchText);
+                const matchesTag = activeTag === 'all' || cardTags.includes(activeTag);
+
+                if (matchesSearch && matchesTag) {
+                    card.style.display = 'block';
+                    card.style.order = sortedSpots.findIndex(s => s.id === id);
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+
+        searchInput.addEventListener('input', filterSpots);
+
+        tags.forEach(tag => {
+            tag.addEventListener('click', () => {
+                tags.forEach(t => t.classList.remove('active'));
+                tag.classList.add('active');
+                filterSpots();
+            });
+        });
+
+        sortSelect.addEventListener('change', filterSpots);
+
+        function loadComments() {
+            const comments = JSON.parse(localStorage.getItem('siteComments') || '[]');
+            const container = document.getElementById('commentsList');
+            container.innerHTML = '';
+
+            comments.forEach(comment => {
+                addCommentToDOM(comment);
+            });
+        }
+
+        function addCommentToDOM(comment) {
+            const container = document.getElementById('commentsList');
+            const div = document.createElement('div');
+            div.className = 'comment-item';
+            div.dataset.id = comment.id;
+
+            const avatar = comment.author.charAt(0);
+            const time = formatTime(comment.time);
+
+            div.innerHTML = `
+                <div class="comment-header">
+                    <div class="comment-author">
+                        <div class="comment-avatar">${avatar}</div>
+                        <span>${comment.author}</span>
+                    </div>
+                    <span class="comment-time">${time}</span>
+                </div>
+                <div class="comment-content">${escapeHtml(comment.content)}</div>
+                <div class="comment-actions">
+                    <button class="comment-action-btn delete-comment" data-id="${comment.id}">
+                        <span>🗑️</span> 删除
+                    </button>
+                </div>
+            `;
+
+            container.insertBefore(div, container.firstChild);
+
+            div.querySelector('.delete-comment').addEventListener('click', () => {
+                deleteComment(comment.id);
+            });
+        }
+
+        function formatTime(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (minutes < 1) return '刚刚';
+            if (minutes < 60) return `${minutes}分钟前`;
+            if (hours < 24) return `${hours}小时前`;
+            if (days < 7) return `${days}天前`;
+            return new Date(timestamp).toLocaleDateString('zh-CN');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function submitComment() {
+            const input = document.getElementById('commentInput');
+            const content = input.value.trim();
+
+            if (!content) {
+                showToast('请输入留言内容');
+                return;
+            }
+
+            const authors = ['校园探险家', '打卡爱好者', '旅行达人', '美食家', '摄影达人', '校园博主'];
+            const randomAuthor = authors[Math.floor(Math.random() * authors.length)] + Math.floor(Math.random() * 100);
+
+            const comment = {
+                id: Date.now(),
+                author: randomAuthor,
+                content: content,
+                time: Date.now()
+            };
+
+            let comments = JSON.parse(localStorage.getItem('siteComments') || '[]');
+            comments.unshift(comment);
+            localStorage.setItem('siteComments', JSON.stringify(comments));
+
+            addCommentToDOM(comment);
+            updateCommentCount();
+            input.value = '';
+            showToast('留言发布成功');
+        }
+
+        function deleteComment(id) {
+            let comments = JSON.parse(localStorage.getItem('siteComments') || '[]');
+            comments = comments.filter(c => c.id !== id);
+            localStorage.setItem('siteComments', JSON.stringify(comments));
+
+            document.querySelector(`.comment-item[data-id="${id}"]`)?.remove();
+            updateCommentCount();
+            showToast('留言已删除');
+        }
+
+        function updateCommentCount() {
+            const comments = JSON.parse(localStorage.getItem('siteComments') || '[]');
+            document.getElementById('commentCount').textContent = comments.length;
+        }
+
+        document.getElementById('submitComment').addEventListener('click', submitComment);
+
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+
+            document.getElementById('progressBar').style.width = `${progress}%`;
+
+            if (scrollTop > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            }, 800);
+        });
+
+        loadData();
+    </script>
 </body>
 </html>

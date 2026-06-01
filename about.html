@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于站长 - 校园打卡指南</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f9f9;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(135deg, #a8e6cf 0%, #87ceeb 100%);
+            color: #2d5a5a;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: #2d5a5a;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 100px 2rem 60px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #f0f7f7;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a8e6cf 0%, #87ceeb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            flex-shrink: 0;
+        }
+
+        .profile-info h2 {
+            font-size: 1.8rem;
+            color: #2d5a5a;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-info p {
+            color: #5a7a7a;
+            font-size: 1rem;
+        }
+
+        .profile-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .profile-tag {
+            padding: 0.3rem 0.8rem;
+            background: #e8f5f3;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            color: #5a7a7a;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section h3 {
+            font-size: 1.3rem;
+            color: #2d5a5a;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section p {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .skill-item {
+            background: #f8fdfb;
+            padding: 1rem;
+            border-radius: 12px;
+            border-left: 4px solid #a8e6cf;
+        }
+
+        .skill-item h4 {
+            color: #2d5a5a;
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .skill-item p {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, #a8e6cf, #87ceeb);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.35rem;
+            top: 0.3rem;
+            width: 12px;
+            height: 12px;
+            background: #a8e6cf;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #a8e6cf;
+        }
+
+        .timeline-item h4 {
+            color: #2d5a5a;
+            font-size: 1.05rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-item .time {
+            font-size: 0.85rem;
+            color: #87ceeb;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-item p {
+            font-size: 0.95rem;
+        }
+
+        .contact-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.2rem;
+            background: #f8fdfb;
+            border-radius: 10px;
+            color: #2d5a5a;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .contact-item:hover {
+            background: linear-gradient(135deg, #a8e6cf 0%, #87ceeb 100%);
+            color: white;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, #a8e6cf 0%, #87ceeb 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(168, 230, 207, 0.4);
+        }
+
+        footer {
+            background-color: #2d5a5a;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 2.5rem;
+            }
+
+            main {
+                padding: 130px 1rem 40px;
+            }
+
+            .profile-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>🏫 校园打卡指南</h1>
+            <nav class="nav-links">
+                <a href="index.html">返回首页</a>
+                <a href="index.html#comments">留言板</a>
+                <a href="about.html" class="active">关于站长</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="avatar">👨‍💻</div>
+                <div class="profile-info">
+                    <h2>张小园</h2>
+                    <p>计算机科学与技术专业 · 大三学生</p>
+                    <div class="profile-tags">
+                        <span class="profile-tag">前端开发</span>
+                        <span class="profile-tag">校园博主</span>
+                        <span class="profile-tag">摄影爱好者</span>
+                        <span class="profile-tag">UI设计</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>👤 个人简介</h3>
+                <p>热爱技术与设计的完美结合，专注于前端开发与用户体验设计。作为一名校园博主，我热衷于发现和分享校园中的美好角落，希望用技术让校园生活更加便捷有趣。课余时间喜欢摄影、旅行和探索新事物。</p>
+            </div>
+
+            <div class="section">
+                <h3>💼 项目经历</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h4>校园打卡指南 Web 应用</h4>
+                        <div class="time">2024.03 - 2024.06</div>
+                        <p>独立开发并上线运营的校园打卡推荐平台，集成分布式数据展示、用户交互和社交分享功能，累计服务校内师生 2000+ 人次。</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>智慧校园移动端小程序</h4>
+                        <div class="time">2023.09 - 2024.01</div>
+                        <p>作为前端开发参与校级创新创业项目，负责用户界面设计和核心交互功能开发，获得校级优秀项目奖。</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>学生社团管理系统</h4>
+                        <div class="time">2023.03 - 2023.06</div>
+                        <p>为校学生会开发的后台管理系统，包含活动管理、成员管理和资源调度等功能，现已在校内稳定运行。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🎯 专业技能</h3>
+                <div class="skills-grid">
+                    <div class="skill-item">
+                        <h4>HTML5 / CSS3</h4>
+                        <p>熟练掌握语义化标签、Flexbox、Grid 布局</p>
+                    </div>
+                    <div class="skill-item">
+                        <h4>JavaScript / ES6+</h4>
+                        <p>熟悉 DOM 操作、异步编程和模块化开发</p>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Vue.js / React</h4>
+                        <p>掌握组件化开发和状态管理方案</p>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Node.js</h4>
+                        <p>能够独立搭建后端服务和 RESTful API</p>
+                    </div>
+                    <div class="skill-item">
+                        <h4>UI/UX 设计</h4>
+                        <p>熟悉 Figma 和 Sketch，具备设计审美</p>
+                    </div>
+                    <div class="skill-item">
+                        <h4>移动端适配</h4>
+                        <p>响应式设计和 PWA 开发经验</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🏆 荣誉奖项</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h4>校级优秀学生干部</h4>
+                        <div class="time">2024.01</div>
+                        <p>因在学生工作和科技创新中的突出表现获得表彰</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>程序设计竞赛二等奖</h4>
+                        <div class="time">2023.11</div>
+                        <p>省级大学生程序设计竞赛中荣获二等奖</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>创新创业大赛银奖</h4>
+                        <div class="time">2023.05</div>
+                        <p>校园创新创业大赛中获得银奖及创业孵化资格</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📬 联系方式</h3>
+                <div class="contact-links">
+                    <a href="mailto:xiaoyuan@example.edu.cn" class="contact-item">
+                        <span>📧</span> xiaoyuan@example.edu.cn
+                    </a>
+                    <a href="#" class="contact-item">
+                        <span>📱</span> GitHub: @xiaoyuan-checkin
+                    </a>
+                    <a href="#" class="contact-item">
+                        <span>💬</span> 微信公众号: 校园探秘记
+                    </a>
+                </div>
+            </div>
+
+            <a href="index.html" class="back-btn">← 返回首页</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 校园打卡指南 | 记录青春美好时光 | by 张小园</p>
+    </footer>
+</body>
+</html>
